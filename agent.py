@@ -14,7 +14,7 @@ from livekit.agents import (
 )
 from livekit.plugins import (
     cartesia,
-    openai,
+    google,
     deepgram,
     noise_cancellation,
     silero,
@@ -37,7 +37,7 @@ class Assistant(Agent):
             "You should use short and concise responses, and avoiding usage of unpronouncable punctuation. "
             "You were created as a demo to showcase the capabilities of LiveKit's agents framework.",
             stt=deepgram.STT(),
-            llm=openai.LLM(model="gpt-4o-mini"),
+            llm=google.LLM(model="gemini-2.0-flash-exp", temperature=0.8),
             tts=cartesia.TTS(),
             # use LiveKit's transformer-based turn detector
             turn_detection=MultilingualModel(),

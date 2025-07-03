@@ -4,6 +4,12 @@ import threading
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 
+import tracemalloc
+import os
+import psutil
+
+tracemalloc.start()
+
 from livekit.agents import (
     Agent, AgentSession, AutoSubscribe,
     JobContext, JobProcess, WorkerOptions,
@@ -123,8 +129,18 @@ def run_flask():
     app.run(host="0.0.0.0", port=8000)
 
 if __name__ == "__main__":
+    # 🧠 Measure initial memory usage from OS
+    process = psutil.Process(os.getpid())
+    print(f"[INFO] Initial memory used: {process.memory_info().rss / (1024 * 1024):.2f} MB")
+
+    # 🧠 Measure traced allocations (peak, current)
+    current, peak = tracemalloc.get_traced_memory()
+    print(f"[TRACEMALLOC] Current = {current / 10**6:.2f} MB; Peak = {peak / 10**6:.2f} MB")
+
+    # ✅ Start Flask server in background
     threading.Thread(target=run_flask, daemon=True).start()
 
+    # ✅ Start LiveKit worker logic
     cli.run_app(
         WorkerOptions(
             entrypoint_fnc=entrypoint,
